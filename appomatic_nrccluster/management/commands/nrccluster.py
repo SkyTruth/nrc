@@ -170,7 +170,7 @@ class Command(django.core.management.base.BaseCommand):
           select
             distinct incidenttype
           from
-            NrcReleaseIncidents 
+            "NrcReleaseIncidents" 
           where
             region='gulf'
             and extract(day from NOW()-incident_datetime) <= 366
@@ -213,7 +213,7 @@ class Command(django.core.management.base.BaseCommand):
                 lat,
                 ST_AsText(ST_Point(lng, lat)) as shape
               from
-                NrcReleaseIncidents 
+                "NrcReleaseIncidents" 
               where
                 region='gulf'
                 and extract(day from NOW()-incident_datetime) <= 366
@@ -263,7 +263,7 @@ class Command(django.core.management.base.BaseCommand):
           select
             geocode_source, reportnum, incident_datetime, incidenttype, lat, lng, ST_MakePoint(lng, lat)
           from
-            NrcReleaseIncidents 
+            "NrcReleaseIncidents"
           where
             region='gulf'
             and extract(day from NOW()-incident_datetime) <= 366
