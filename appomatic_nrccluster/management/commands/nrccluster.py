@@ -8,6 +8,7 @@ import shapely.wkb
 import shapely.wkt
 import fastkml.kml
 import fastkml.styles
+import datetime
 
 def dictreader(cur):
     for row in cur:
@@ -128,7 +129,14 @@ class Command(django.core.management.base.BaseCommand):
             max_score desc
         """)
 
-        folder = fastkml.kml.Folder('{http://www.opengis.net/kml/2.2}', 'timeperiod-%s' % (timeperiod,), '%s days' % (timeperiod,), '')
+        if timeperiod is None:
+            title = 'All time'
+            description = 'Clusters of reports from any time'
+        else:
+            title = '%s days' % (timeperiod,)
+            description = 'Clusters of reports from the last %s days' % (timeperiod,)
+
+        folder = fastkml.kml.Folder('{http://www.opengis.net/kml/2.2}', 'timeperiod-%s' % (timeperiod,), title, description)
         doc.append(folder)
 
         seq = 0
@@ -156,9 +164,9 @@ class Command(django.core.management.base.BaseCommand):
 
         icons = [
             "http://maps.google.com/mapfiles/kml/shapes/open-diamond.png",
-            "http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png",
+#            "http://maps.google.com/mapfiles/kml/shapes/placemark_circle_highlight.png",
             "http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png",
-            "http://maps.google.com/mapfiles/kml/shapes/placemark_square_highlight.png",
+#            "http://maps.google.com/mapfiles/kml/shapes/placemark_square_highlight.png",
             "http://maps.google.com/mapfiles/kml/shapes/placemark_square.png",
             "http://maps.google.com/mapfiles/kml/shapes/polygon.png",
             "http://maps.google.com/mapfiles/kml/shapes/star.png",
@@ -251,7 +259,11 @@ class Command(django.core.management.base.BaseCommand):
     def extract_kml(self):
         kml = fastkml.kml.KML()
         ns = '{http://www.opengis.net/kml/2.2}'
-        doc = fastkml.kml.Document(ns, 'docid', 'doc name', 'doc description')
+        doc = fastkml.kml.Document(
+            ns,
+            'nrd-cluster-%s' % (datetime.datetime.now().strftime('%Y-%m-%d'),),
+            'NRC Clusters %s' % (datetime.datetime.now().strftime('%Y-%m-%d'),),
+            'Cluster analysis of all recent NRC reports in the gulf of mexico that indicate a release of materials into the environment.')
         kml.append(doc)
 
         self.cur.execute("truncate table appomatic_nrccluster_nrcreport")
